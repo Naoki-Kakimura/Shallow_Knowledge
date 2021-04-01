@@ -65,14 +65,20 @@ public class ShallowKnowledge {
       inReader.close();
 
       strResult = result.toString();
-      String resultUtf8 = URLDecoder.decode(strResult, "UTF-8");
-      byte[] byteResult = resultUtf8.getBytes("UTF-8");
-      String newResult = new String(byteResult, "UTF-8");
-      int startIndex = newResult.indexOf("<extract xml:space=\"preserve\">");
-      startIndex += "<extract xml:space=\"preserve\">".length();
-      int endIndex = newResult.indexOf("</extract>");
-      String extract = newResult.substring(startIndex, endIndex);
-      return extract;
+      if(strResult.contains("<extract xml:space=\"preserve\">")){
+        String resultUtf8 = URLDecoder.decode(strResult, "UTF-8");
+        byte[] byteResult = resultUtf8.getBytes("UTF-8");
+        String newResult = new String(byteResult, "UTF-8");
+        int startIndex = newResult.indexOf("<extract xml:space=\"preserve\">");
+        startIndex += "<extract xml:space=\"preserve\">".length();
+        int endIndex = newResult.indexOf("</extract>");
+        String extract = newResult.substring(startIndex, endIndex);
+        return extract;
+      }else {
+        String msg = "申し訳ございません。入力していただいた単語は、wikipedia常には存在しないタイトル名です。";
+        return msg;
+      }
+      
     }else {
       try {
         stream = connection.getInputStream();
@@ -80,7 +86,7 @@ public class ShallowKnowledge {
       catch (IOException e) {
         stream = connection.getErrorStream();
       }
-      return "見つかりませんでした"+ apiUrl + responseCode + stream;
+      return "申し訳ございません。アクセスエラーが発生しました\n"+ apiUrl + responseCode + stream;
     }
   }
 }
